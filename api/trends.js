@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
     try {
-        const url = "https://trends.google.com/trends/trendingsearches/daily/rss?geo=JP";
+        const url = "https://trends.google.com/trending/rss?geo=JP";
 
         const response = await fetch(url, {
             headers: {
@@ -14,6 +14,11 @@ export default async function handler(req, res) {
         const parser = new XMLParser();
 
         const json = parser.parse(text);
+
+        // 安全チェック
+        if (!json?.rss?.channel?.item) {
+            return res.status(500).json({ error: "データ取得失敗（構造不正）" });
+        }
 
         const items = json.rss.channel.item;
 
